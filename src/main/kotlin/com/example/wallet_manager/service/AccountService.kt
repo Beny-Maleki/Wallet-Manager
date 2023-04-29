@@ -1,36 +1,37 @@
 package com.example.wallet_manager.service
 
-import com.example.wallet_manager.model.Account
-import com.example.wallet_manager.model.AccountNotFound
-import com.example.wallet_manager.model.NotAnyAccountExist
-import com.example.wallet_manager.model.UpdateType
+import com.example.wallet_manager.model.*
 import com.example.wallet_manager.repositories.AccountRepository
 import org.springframework.stereotype.Service
+import kotlin.jvm.Throws
 
 @Service
 class AccountService(val db: AccountRepository) {
     //// CRUD services ////
 
     // CREATE type services
-    fun registerNewAccount(owner: String) {
+    fun registerNewAccount(owner: String): Message {
         val newAccount: Account = Account()
         newAccount.owner = owner
         db.save(newAccount)
+        return Message(null, AnswerStatus.SUCCESSFUL, "")
     }
 
     // READ type services
-    fun getAllAccounts(): List<Account> {
+    @Throws(NotAnyAccountExist::class)
+    fun getAllAccounts(): Message {
         if (db.count() > 0) {
-            return db.findAll().toList()
+            return Message(db.findAll().toList(), AnswerStatus.SUCCESSFUL, "")
         } else {
             throw NotAnyAccountExist()
         }
 
     }
 
-    fun getAccountById(id: Long): Account {
+    @Throws(AccountNotFound::class)
+    fun getAccountById(id: Long): Message {
         if (db.existsById(id)) {
-            return db.findAccountById(id)
+            return Message(listOf(db.findAccountById(id)), AnswerStatus.SUCCESSFUL, "")
         } else {
             throw AccountNotFound(id)
         }
@@ -38,7 +39,8 @@ class AccountService(val db: AccountRepository) {
     }
 
     // UPDATE type services
-    fun updateAccountBalanceById(id: Long, type: UpdateType, amount: Long) {
+    @Throws(AccountNotFound::class)
+    fun updateAccountBalance(id: Long, type: UpdateType, amount: Long): Message {
         if (db.existsById(id)) {
             val account: Account = db.findAccountById(id)
             if (type == UpdateType.DECREASE) {
@@ -47,15 +49,18 @@ class AccountService(val db: AccountRepository) {
                 account.balance += amount
             }
             db.save(account)
+            return Message(null, AnswerStatus.SUCCESSFUL, "")
         } else {
             throw AccountNotFound(id)
         }
     }
 
     // DELETE type services
-    fun deleteAccountById(id: Long) {
+    @Throws(AccountNotFound::class)
+    fun deleteAccountById(id: Long): Message {
         if(db.existsById(id)) {
             db.deleteById(id)
+            return Message(null, AnswerStatus.SUCCESSFUL, "")
         } else {
             throw AccountNotFound(id)
         }
