@@ -2,17 +2,25 @@ package com.example.wallet_manager.service
 
 import com.example.wallet_manager.model.*
 import com.example.wallet_manager.repositories.AccountRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
+
 @Service
-class AccountService(val db: AccountRepository) {
+class AccountService @Autowired constructor(val db: AccountRepository) {
     //// CRUD services ////
 
     // CREATE type services
-    fun registerNewAccount(owner: String): Message {
-        val newAccount: Account = Account()
+    @Throws(AccountAlreadyExists::class)
+    fun registerNewAccount(owner: String, balance: Long): Message {
+        if (db.existsAccountByOwner(owner)) {
+            throw AccountAlreadyExists(owner)
+        }
+        val newAccount = Account()
         newAccount.owner = owner
+        newAccount.balance = balance
         db.save(newAccount)
         return Message(null, AnswerStatus.SUCCESSFUL, "")
     }
