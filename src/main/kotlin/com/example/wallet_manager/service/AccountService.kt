@@ -1,9 +1,14 @@
 package com.example.wallet_manager.service
 
-import com.example.wallet_manager.model.*
+import com.example.wallet_manager.model.entities.Account
+import com.example.wallet_manager.model.entities.Message
+import com.example.wallet_manager.model.utils.exceptions.AccountAlreadyExists
+import com.example.wallet_manager.model.utils.exceptions.AccountNotFound
+import com.example.wallet_manager.model.utils.exceptions.NotAnyAccountExist
+import com.example.wallet_manager.model.utils.enums.AnswerStatus
+import com.example.wallet_manager.model.utils.enums.UpdateType
 import com.example.wallet_manager.repositories.AccountRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 

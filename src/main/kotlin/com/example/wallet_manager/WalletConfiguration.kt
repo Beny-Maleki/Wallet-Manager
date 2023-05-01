@@ -1,6 +1,6 @@
 package com.example.wallet_manager
 
-import com.example.wallet_manager.model.Account
+import com.example.wallet_manager.model.entities.Account
 import com.example.wallet_manager.repositories.AccountRepository
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean

@@ -1,4 +1,4 @@
-package com.example.wallet_manager.model
+package com.example.wallet_manager.model.utils.enums
 
 enum class AnswerStatus {
     SUCCESSFUL,

@@ -1,9 +1,15 @@
 package com.example.wallet_manager.controller
 
+import com.example.wallet_manager.dto.AccountCreateRequest
+import com.example.wallet_manager.dto.AccountUpdateRequest
 import com.example.wallet_manager.model.*
+import com.example.wallet_manager.model.entities.Message
+import com.example.wallet_manager.model.utils.exceptions.AccountAlreadyExists
+import com.example.wallet_manager.model.utils.exceptions.AccountNotFound
+import com.example.wallet_manager.model.utils.exceptions.NotAnyAccountExist
+import com.example.wallet_manager.model.utils.enums.AnswerStatus
 import com.example.wallet_manager.service.AccountService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
 import org.springframework.web.bind.annotation.*
 
 @RestController

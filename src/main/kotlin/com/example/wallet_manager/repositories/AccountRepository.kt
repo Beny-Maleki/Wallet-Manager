@@ -1,8 +1,7 @@
 package com.example.wallet_manager.repositories
 
-import com.example.wallet_manager.model.Account
+import com.example.wallet_manager.model.entities.Account
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
