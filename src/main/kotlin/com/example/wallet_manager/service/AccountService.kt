@@ -19,9 +19,7 @@ class AccountService @Autowired constructor(
         val db: AccountRepository,
         val kafkaTemplate: KafkaTemplate<String, String>
 ) {
-
     //// CRUD services ////
-
     // CREATE type services
     @Throws(AccountAlreadyExists::class)
     fun registerNewAccount(owner: String, balance: Long): Message {
@@ -83,6 +81,8 @@ class AccountService @Autowired constructor(
             throw AccountNotFound(id)
         }
     }
+    ///////////////////////
+
 
 
 }
