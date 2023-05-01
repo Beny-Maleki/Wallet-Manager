@@ -9,12 +9,17 @@ import com.example.wallet_manager.model.utils.enums.AnswerStatus
 import com.example.wallet_manager.model.utils.enums.UpdateType
 import com.example.wallet_manager.repositories.AccountRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
 
 @Service
-class AccountService @Autowired constructor(val db: AccountRepository) {
+class AccountService @Autowired constructor(
+        val db: AccountRepository,
+        val kafkaTemplate: KafkaTemplate<String, String>
+) {
+
     //// CRUD services ////
 
     // CREATE type services
