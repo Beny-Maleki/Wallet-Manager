@@ -4,6 +4,7 @@ import com.example.wallet_manager.dto.AccountCreateRequest
 import com.example.wallet_manager.dto.AccountUpdateRequest
 import com.example.wallet_manager.model.*
 import com.example.wallet_manager.model.entities.Message
+import com.example.wallet_manager.model.entities.Transaction
 import com.example.wallet_manager.model.utils.exceptions.AccountAlreadyExists
 import com.example.wallet_manager.model.utils.exceptions.AccountNotFound
 import com.example.wallet_manager.model.utils.exceptions.NotAnyAccountExist
@@ -37,10 +38,10 @@ class AccountController @Autowired constructor( val service: AccountService){
         }
     }
 
-    @PutMapping("/update/account/{id}")
-    fun updateAccountById(@PathVariable(value= "id") id: Long, @RequestBody body: AccountUpdateRequest): Message {
+    @PutMapping("/update/account/")
+    fun updateAccountById(@RequestBody body: AccountUpdateRequest): Message {
         return try {
-            service.updateAccountBalance(id, body.type, body.amount)
+            service.updateAccountBalance(body)
         } catch (e: AccountNotFound) {
             Message(null, AnswerStatus.ERROR, e.message.toString())
         }
@@ -55,7 +56,7 @@ class AccountController @Autowired constructor( val service: AccountService){
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/account/{id}")
     fun deleteAccountById(@PathVariable(value = "id") id: Long): Message {
         return try {
             service.deleteAccountById(id)

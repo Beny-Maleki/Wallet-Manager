@@ -1,7 +1,9 @@
 package com.example.wallet_manager.service
 
+import com.example.wallet_manager.dto.AccountUpdateRequest
 import com.example.wallet_manager.model.entities.Account
 import com.example.wallet_manager.model.entities.Message
+import com.example.wallet_manager.model.entities.Transaction
 import com.example.wallet_manager.model.utils.exceptions.AccountAlreadyExists
 import com.example.wallet_manager.model.utils.exceptions.AccountNotFound
 import com.example.wallet_manager.model.utils.exceptions.NotAnyAccountExist
@@ -15,9 +17,9 @@ import kotlin.jvm.Throws
 
 
 @Service
-class AccountService @Autowired constructor(
+class AccountService (
         val db: AccountRepository,
-        val kafkaTemplate: KafkaTemplate<String, String>
+        val kafkaProducer: KafkaProducer
 ) {
     //// CRUD services ////
     // CREATE type services
@@ -56,18 +58,20 @@ class AccountService @Autowired constructor(
 
     // UPDATE type services
     @Throws(AccountNotFound::class)
-    fun updateAccountBalance(id: Long, type: UpdateType, amount: Long): Message {
-        if (db.existsById(id)) {
-            val account: Account = db.findAccountById(id)
-            if (type == UpdateType.DECREASE) {
-                account.balance -= amount
-            } else if (type == UpdateType.INCREASE) {
-                account.balance += amount
+    fun updateAccountBalance(accountUpdateRequest: AccountUpdateRequest): Message {
+        if (db.existsById(accountUpdateRequest.accountId)) {
+            kafkaProducer.sendMessage("transactions", accountUpdateRequest)
+            // Updating the account balance in Postgres "account" table
+            val account: Account = db.findAccountById(accountUpdateRequest.accountId)
+            if (accountUpdateRequest.type == UpdateType.DECREASE) {
+                account.balance -= accountUpdateRequest.amount
+            } else if (accountUpdateRequest.type == UpdateType.INCREASE) {
+                account.balance += accountUpdateRequest.amount
             }
             db.save(account)
             return Message(null, AnswerStatus.SUCCESSFUL, "")
         } else {
-            throw AccountNotFound(id)
+            throw AccountNotFound(accountUpdateRequest.accountId)
         }
     }
 
@@ -83,6 +87,6 @@ class AccountService @Autowired constructor(
     }
     ///////////////////////
 
-
+    
 
 }

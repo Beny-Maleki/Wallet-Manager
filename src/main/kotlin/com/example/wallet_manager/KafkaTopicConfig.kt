@@ -19,6 +19,6 @@ class KafkaTopicConfig (
 
     @Bean
     fun topic1(): NewTopic {
-        return NewTopic("First Topic", 2, 2)
+        return NewTopic("transactions", 1, 1)
     }
 }
