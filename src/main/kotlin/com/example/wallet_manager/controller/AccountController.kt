@@ -4,7 +4,6 @@ import com.example.wallet_manager.dto.AccountCreateRequest
 import com.example.wallet_manager.dto.AccountUpdateRequest
 import com.example.wallet_manager.model.*
 import com.example.wallet_manager.model.entities.Message
-import com.example.wallet_manager.model.entities.Transaction
 import com.example.wallet_manager.model.utils.exceptions.AccountAlreadyExists
 import com.example.wallet_manager.model.utils.exceptions.AccountNotFound
 import com.example.wallet_manager.model.utils.exceptions.NotAnyAccountExist

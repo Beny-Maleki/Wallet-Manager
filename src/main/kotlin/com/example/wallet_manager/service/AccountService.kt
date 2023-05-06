@@ -3,23 +3,20 @@ package com.example.wallet_manager.service
 import com.example.wallet_manager.dto.AccountUpdateRequest
 import com.example.wallet_manager.model.entities.Account
 import com.example.wallet_manager.model.entities.Message
-import com.example.wallet_manager.model.entities.Transaction
 import com.example.wallet_manager.model.utils.exceptions.AccountAlreadyExists
 import com.example.wallet_manager.model.utils.exceptions.AccountNotFound
 import com.example.wallet_manager.model.utils.exceptions.NotAnyAccountExist
 import com.example.wallet_manager.model.utils.enums.AnswerStatus
 import com.example.wallet_manager.model.utils.enums.UpdateType
 import com.example.wallet_manager.repositories.AccountRepository
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
 
 @Service
 class AccountService (
-        val db: AccountRepository,
-        val kafkaProducer: KafkaProducer
+        private val db: AccountRepository,
+        private val kafkaProducer: KafkaProducer
 ) {
     //// CRUD services ////
     // CREATE type services
@@ -31,6 +28,7 @@ class AccountService (
         val newAccount = Account()
         newAccount.owner = owner
         newAccount.balance = balance
+        updateAccountBalance(AccountUpdateRequest(newAccount.id, UpdateType.INCREASE, newAccount.balance))
         db.save(newAccount)
         return Message(null, AnswerStatus.SUCCESSFUL, "")
     }
@@ -59,7 +57,7 @@ class AccountService (
     // UPDATE type services
     @Throws(AccountNotFound::class)
     fun updateAccountBalance(accountUpdateRequest: AccountUpdateRequest): Message {
-        if (db.existsById(accountUpdateRequest.accountId)) {
+        if (validateAccountUpdateRequest(accountUpdateRequest)) {
             kafkaProducer.sendMessage("transactions", accountUpdateRequest)
             // Updating the account balance in Postgres "account" table
             val account: Account = db.findAccountById(accountUpdateRequest.accountId)
@@ -73,6 +71,20 @@ class AccountService (
         } else {
             throw AccountNotFound(accountUpdateRequest.accountId)
         }
+    }
+
+    private fun validateAccountUpdateRequest(accountUpdateRequest: AccountUpdateRequest): Boolean {
+        val accountExists: Boolean = db.existsById(accountUpdateRequest.accountId!!)
+        if (!accountExists) return accountExists
+
+        val accountBalanceIsEnough = balanceIsEnough(accountUpdateRequest)
+        return accountBalanceIsEnough
+    }
+
+    private fun balanceIsEnough(accountUpdateRequest: AccountUpdateRequest): Boolean {
+        val account: Account = db.findAccountById(accountUpdateRequest.accountId)
+        return (accountUpdateRequest.type == UpdateType.INCREASE) || ((account.balance - accountUpdateRequest.amount) > 0)
+
     }
 
     // DELETE type services

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 class AccountUpdateRequest (
         @JsonProperty("accountId")
-        val accountId: Long,
+        val accountId: Long?,
         @JsonProperty("type")
         val type: UpdateType,
         @JsonProperty("amount")
